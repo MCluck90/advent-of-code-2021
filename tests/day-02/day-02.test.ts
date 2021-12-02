@@ -50,19 +50,38 @@ describe('Day 2: Dive!', () => {
     })
   })
 
-  xdescribe('Part 2', () => {
+  describe('Part 2', () => {
     function solution(commands: [Direction, number][]): number {
-      return 0
+      let aim = 0
+      let x = 0
+      let y = 0
+      for (const [direction, units] of commands) {
+        switch (direction) {
+          case 'down':
+            aim += units
+            break
+
+          case 'up':
+            aim -= units
+            break
+
+          case 'forward':
+            x += units
+            y += aim * units
+            break
+        }
+      }
+      return x * y
     }
 
     test('with example data', () => {
       const testData = load('test-2')
-      expect(solution(testData)).toBe(5)
+      expect(solution(testData)).toBe(900)
     })
 
     test('with puzzle input', () => {
       const testData = load('puzzle')
-      expect(solution(testData)).toBe(1567)
+      expect(solution(testData)).toBe(1488311643)
     })
   })
 })
