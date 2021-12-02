@@ -36,6 +36,7 @@ describe('Day 1: Sonar Sweep', () => {
       expect(solution(testData)).toBe(1529)
     })
   })
+
   describe('Part 2', () => {
     function solution(input: string): number {
       const measurements = input.split('\n').map((n) => Number(n))
