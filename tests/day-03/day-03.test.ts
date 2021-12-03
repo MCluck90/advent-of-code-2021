@@ -25,7 +25,7 @@ const invert = (binary: number[]) => binary.map((n) => (n === 1 ? 0 : 1))
 
 const toDecimal = (binary: number[]) => parseInt(binary.join(''), 2)
 
-describe('Day 2: Dive!', () => {
+describe('Day 3: Binary Diagnostic', () => {
   describe('Part 1', () => {
     function solution(data: number[][]): number {
       const mostCommon = getMostCommon(data)
