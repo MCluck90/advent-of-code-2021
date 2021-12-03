@@ -16,10 +16,10 @@ const load = (type: 'test-1' | 'test-2' | 'puzzle') => {
   return parse(readFileSync(filePath).toString())
 }
 
-const getMostCommon = (data: number[][]) =>
+const getMostCommon = (data: number[][], column?: number) =>
   data
     .reduce((acc, row) => acc.map((x, i) => x + row[i]))
-    .map((n) => (n > data.length / 2 ? 1 : 0))
+    .map((n) => (n >= data.length / 2 ? 1 : 0))
 
 const invert = (binary: number[]) => binary.map((n) => (n === 1 ? 0 : 1))
 
@@ -46,19 +46,38 @@ describe('Day 2: Dive!', () => {
     })
   })
 
-  xdescribe('Part 2', () => {
+  describe('Part 2', () => {
     function solution(data: number[][]): number {
-      return 0
+      let oxygenSearchSpace = data
+      let co2SearchSpace = data
+      for (let i = 0; i < data.length; i++) {
+        if (oxygenSearchSpace.length > 1) {
+          const mostCommon = getMostCommon(oxygenSearchSpace)[i]
+          oxygenSearchSpace = oxygenSearchSpace.filter(
+            (row) => row[i] === mostCommon
+          )
+        }
+        if (co2SearchSpace.length > 1) {
+          const leastCommon = invert(getMostCommon(co2SearchSpace))[i]
+          co2SearchSpace = co2SearchSpace.filter(
+            (row) => row[i] === leastCommon
+          )
+        }
+      }
+
+      const oxygenGeneratorRating = toDecimal(oxygenSearchSpace[0])
+      const co2ScrubberRating = toDecimal(co2SearchSpace[0])
+      return oxygenGeneratorRating * co2ScrubberRating
     }
 
     test('with example data', () => {
       const testData = load('test-2')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(230)
     })
 
     test('with puzzle input', () => {
       const testData = load('puzzle')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(4856080)
     })
   })
 })
