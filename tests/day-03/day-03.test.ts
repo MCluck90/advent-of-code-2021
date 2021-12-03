@@ -16,18 +16,23 @@ const load = (type: 'test-1' | 'test-2' | 'puzzle') => {
   return parse(readFileSync(filePath).toString())
 }
 
+const getMostCommon = (data: number[][]) =>
+  data
+    .reduce((acc, row) => acc.map((x, i) => x + row[i]))
+    .map((n) => (n > data.length / 2 ? 1 : 0))
+
+const invert = (binary: number[]) => binary.map((n) => (n === 1 ? 0 : 1))
+
+const toDecimal = (binary: number[]) => parseInt(binary.join(''), 2)
+
 describe('Day 2: Dive!', () => {
   describe('Part 1', () => {
     function solution(data: number[][]): number {
-      const totals = data.reduce((acc, row) => acc.map((x, i) => x + row[i]))
-
-      const half = Math.floor(data.length / 2)
-      const gammaBitSequence = totals.map((n) => (n > half ? 1 : 0))
-      const gammaValue = parseInt(gammaBitSequence.join(''), 2)
-
-      const epsilonBitSequence = totals.map((n) => (n <= half ? 1 : 0))
-      const epsilonValue = parseInt(epsilonBitSequence.join(''), 2)
-      return gammaValue * epsilonValue
+      const mostCommon = getMostCommon(data)
+      const leastCommon = invert(mostCommon)
+      const gamma = toDecimal(mostCommon)
+      const epsilon = toDecimal(leastCommon)
+      return gamma * epsilon
     }
 
     test('with example data', () => {
