@@ -54,41 +54,37 @@ const toLinePoints = ({ start, end }: LineSegment): Point[] => {
   return points
 }
 
-type Overlaps = Record<number, Record<number, number> | undefined>
+const countOverlaps = (lineSegments: LineSegment[]) => {
+  const overlaps: Record<number, Record<number, number> | undefined> = {}
+  for (const lineSegment of lineSegments) {
+    for (const point of toLinePoints(lineSegment)) {
+      let row = overlaps[point.y]
+      if (!row) {
+        row = overlaps[point.y] = {}
+      }
 
-const countOverlaps = (overlaps: Overlaps) =>
-  Object.values(overlaps).reduce((acc, row) => {
-    if (!row) {
-      return acc
+      if (!row[point.x]) {
+        row[point.x] = 0
+      }
+
+      row[point.x]++
     }
+  }
 
-    return acc + Object.values(row).filter((n) => n >= 2).length
-  }, 0)
+  return Object.values(overlaps).reduce(
+    (acc, row) =>
+      acc + (row ? Object.values(row).filter((n) => n >= 2).length : 0),
+    0
+  )
+}
 
 describe('Day 5: Hydrothermal Venture', () => {
   describe('Part 1', () => {
     function solution(lineSegments: Input): number {
-      const overlaps: Overlaps = {}
       const straightLines = lineSegments.filter(
         ({ start, end }) => start.x === end.x || start.y === end.y
       )
-
-      for (const lineSegment of straightLines) {
-        for (const point of toLinePoints(lineSegment)) {
-          let row = overlaps[point.y]
-          if (!row) {
-            row = overlaps[point.y] = {}
-          }
-
-          if (!row[point.x]) {
-            row[point.x] = 0
-          }
-
-          row[point.x]++
-        }
-      }
-
-      return countOverlaps(overlaps)
+      return countOverlaps(straightLines)
     }
 
     test('with example data', () => {
@@ -104,23 +100,7 @@ describe('Day 5: Hydrothermal Venture', () => {
 
   describe('Part 2', () => {
     function solution(lineSegments: Input): number {
-      const overlaps: Overlaps = {}
-      for (const lineSegment of lineSegments) {
-        for (const point of toLinePoints(lineSegment)) {
-          let row = overlaps[point.y]
-          if (!row) {
-            row = overlaps[point.y] = {}
-          }
-
-          if (!row[point.x]) {
-            row[point.x] = 0
-          }
-
-          row[point.x]++
-        }
-      }
-
-      return countOverlaps(overlaps)
+      return countOverlaps(lineSegments)
     }
 
     test('with example data', () => {
