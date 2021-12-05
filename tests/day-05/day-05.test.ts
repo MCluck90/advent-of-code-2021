@@ -10,6 +10,7 @@ interface LineSegment {
   start: Point
   end: Point
 }
+
 type Input = LineSegment[]
 
 const parse = (input: string): Input => {
