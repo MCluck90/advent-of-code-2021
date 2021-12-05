@@ -37,17 +37,20 @@ const load = (type: 'test-1' | 'test-2' | 'puzzle') => {
   return parse(readFileSync(filePath).toString())
 }
 
-const toLinePoints = (segment: LineSegment): Point[] => {
+const toLinePoints = ({ start, end }: LineSegment): Point[] => {
   const points: Point[] = []
-  const minX = Math.min(segment.start.x, segment.end.x)
-  const maxX = Math.max(segment.start.x, segment.end.x)
-  const minY = Math.min(segment.start.y, segment.end.y)
-  const maxY = Math.max(segment.start.y, segment.end.y)
-  for (let x = minX; x <= maxX; x++) {
-    for (let y = minY; y <= maxY; y++) {
-      points.push({ x, y })
-    }
+  const distance = Math.max(
+    Math.abs(end.x - start.x),
+    Math.abs(end.y - start.y)
+  )
+  const xDirection = Math.sign(end.x - start.x)
+  const yDirection = Math.sign(end.y - start.y)
+  for (let i = 0; i <= distance; i++) {
+    const x = start.x + xDirection * i
+    const y = start.y + yDirection * i
+    points.push({ x, y })
   }
+
   return points
 }
 
@@ -66,15 +69,12 @@ describe('Day 5: Hydrothermal Venture', () => {
   describe('Part 1', () => {
     function solution(lineSegments: Input): number {
       const overlaps: Overlaps = {}
-      const horizontalLines = lineSegments.filter(
-        ({ start, end }) => start.y === end.y
-      )
-      const verticalLines = lineSegments.filter(
-        ({ start, end }) => start.x === end.x
+      const straightLines = lineSegments.filter(
+        ({ start, end }) => start.x === end.x || start.y === end.y
       )
 
-      for (const line of horizontalLines.concat(verticalLines)) {
-        for (const point of toLinePoints(line)) {
+      for (const lineSegment of straightLines) {
+        for (const point of toLinePoints(lineSegment)) {
           let row = overlaps[point.y]
           if (!row) {
             row = overlaps[point.y] = {}
@@ -102,19 +102,35 @@ describe('Day 5: Hydrothermal Venture', () => {
     })
   })
 
-  xdescribe('Part 2', () => {
+  describe('Part 2', () => {
     function solution(lineSegments: Input): number {
-      return 0
+      const overlaps: Overlaps = {}
+      for (const lineSegment of lineSegments) {
+        for (const point of toLinePoints(lineSegment)) {
+          let row = overlaps[point.y]
+          if (!row) {
+            row = overlaps[point.y] = {}
+          }
+
+          if (!row[point.x]) {
+            row[point.x] = 0
+          }
+
+          row[point.x]++
+        }
+      }
+
+      return countOverlaps(overlaps)
     }
 
     test('with example data', () => {
       const testData = load('test-2')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(12)
     })
 
     test('with puzzle input', () => {
       const testData = load('puzzle')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(19164)
     })
   })
 })
