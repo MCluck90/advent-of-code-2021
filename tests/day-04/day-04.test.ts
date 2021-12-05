@@ -135,19 +135,47 @@ describe('Day 4: Giant Squid', () => {
     })
   })
 
-  xdescribe('Part 2', () => {
-    function solution(input: Input): number {
+  describe('Part 2', () => {
+    function solution({ boards, numbersToDraw }: Input): number {
+      const answeredBoards = boards.map(() => createBoard(false))
+      const boardsWithAWin: number[] = []
+      for (const n of numbersToDraw) {
+        for (let y = 0; y < 5; y++) {
+          for (let x = 0; x < 5; x++) {
+            for (let i = 0; i < boards.length; i++) {
+              if (boards[i][y][x] === n) {
+                answeredBoards[i][y][x] = true
+              }
+            }
+          }
+        }
+
+        for (let i = 0; i < boards.length; i++) {
+          if (!boardsWithAWin.includes(i) && hasWon(answeredBoards[i])) {
+            boardsWithAWin.push(i)
+          }
+        }
+
+        if (boardsWithAWin.length === boards.length) {
+          const indexOfLastWinningBoard =
+            boardsWithAWin[boardsWithAWin.length - 1]
+          const lastWinningBoard = boards[indexOfLastWinningBoard]
+          const lastWinningBoardAnswers =
+            answeredBoards[indexOfLastWinningBoard]
+          return getScore(lastWinningBoard, lastWinningBoardAnswers) * n
+        }
+      }
       return 0
     }
 
     test('with example data', () => {
       const testData = load('test-2')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(1924)
     })
 
     test('with puzzle input', () => {
       const testData = load('puzzle')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(14877)
     })
   })
 })
