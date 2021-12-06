@@ -3,12 +3,14 @@ import * as path from 'path'
 import { default as axios } from 'axios'
 import { default as cheerio } from 'cheerio'
 import { default as chalk } from 'chalk'
+import { default as TurndownService } from 'turndown'
 
 const getDayUrl = (day: number) => `https://adventofcode.com/2021/day/${day}`
 const isOk = (status: number) => status >= 200 && status < 300
 
 interface Challenge {
   title: string
+  description: string
   testInput: string
   link: string
 }
@@ -30,10 +32,10 @@ async function main() {
     day = Number(dayArg)
   }
 
-  const challenge = await getChallenge(day)
-  console.log(chalk.green.bold(challenge.title))
-  console.log(chalk.blue.underline(challenge.link))
-  generateTestFile(day, challenge.title, challenge.testInput)
+  const { title, description, testInput, link } = await getChallenge(day)
+  console.log(chalk.green.bold(title))
+  console.log(chalk.blue.underline(link))
+  generateTestFile(day, title, description, testInput)
 
   console.log('Test files have been created.')
   console.log('Next steps:')
@@ -54,14 +56,24 @@ async function getChallenge(day: number): Promise<Challenge> {
   const $description = $('article.day-desc')
   const title = $description.children('h2').text().replace(/---/g, '').trim()
   const testInput = $('pre').first().text().trim()
+
+  const turndownService = new TurndownService()
   return {
     title,
+    description: turndownService.turndown(
+      $description.html()?.toString() || ''
+    ),
     testInput,
     link,
   }
 }
 
-function generateTestFile(day: number, title: string, testInput: string) {
+function generateTestFile(
+  day: number,
+  title: string,
+  description: string,
+  testInput: string
+) {
   const source = `
 import * as path from 'path'
 import { readFileSync } from 'fs'
@@ -120,6 +132,7 @@ describe('${title}', () => {
   const testsFolder = path.join(__dirname, '../tests')
   const dayFolder = path.join(testsFolder, dayName)
   const p = (f: string) => path.join(dayFolder, f)
+  const readme = p('README.md')
   const testFile = p(`${dayName}.test.ts`)
   const puzzleInput = p('puzzle-input.txt')
   const testData1 = p('test-data.part-1.txt')
@@ -127,6 +140,7 @@ describe('${title}', () => {
   if (!fs.existsSync(dayFolder)) {
     fs.mkdirSync(dayFolder)
   }
+  fs.writeFileSync(readme, description)
   fs.writeFileSync(testFile, source)
   fs.writeFileSync(puzzleInput, '')
   fs.writeFileSync(testData1, testInput)
