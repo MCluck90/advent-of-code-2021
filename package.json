@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "new-day": "ts-node scripts/new-day.ts",
+    "yesterday": "ts-node scripts/new-day.ts yesterday",
+    "today": "ts-node scripts/new-day.ts today",
     "test": "jest",
     "watch": "jest --watch"
   },
@@ -15,7 +18,10 @@
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.16.0",
     "@types/jest": "^27.0.3",
+    "axios": "^0.24.0",
     "babel-jest": "^27.4.2",
+    "chalk": "^4.1.2",
+    "cheerio": "^1.0.0-rc.10",
     "jest": "^27.4.2",
     "prettier": "^2.5.0",
     "ts-jest": "^27.0.7",
