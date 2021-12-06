@@ -17,21 +17,25 @@ const load = (type: 'test-1' | 'test-2' | 'puzzle') => {
   return parse(readFileSync(filePath).toString())
 }
 
+function simulate(input: Input, numberOfDays: number) {
+  const population = new Array(9).fill(0)
+  for (const n of input) {
+    population[n]++
+  }
+
+  for (let day = 0; day < numberOfDays; day++) {
+    const n = population.shift()
+    population.push(n)
+    population[6] += n
+  }
+
+  return population.reduce((x, y) => x + y)
+}
+
 describe('Day 6: Lanternfish', () => {
   describe('Part 1', () => {
     function solution(input: Input): number {
-      const population = new Array(9).fill(0)
-      for (const n of input) {
-        population[n]++
-      }
-
-      for (let day = 0; day < 80; day++) {
-        const n = population.shift()
-        population.push(n)
-        population[6] += n
-      }
-
-      return population.reduce((x, y) => x + y)
+      return simulate(input, 80)
     }
 
     test('with example data', () => {
@@ -45,19 +49,19 @@ describe('Day 6: Lanternfish', () => {
     })
   })
 
-  xdescribe('Part 2', () => {
+  describe('Part 2', () => {
     function solution(input: Input): number {
-      return -1
+      return simulate(input, 256)
     }
 
     test('with example data', () => {
       const testData = load('test-2')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(26984457539)
     })
 
     test('with puzzle input', () => {
       const testData = load('puzzle')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(1574445493136)
     })
   })
 })
