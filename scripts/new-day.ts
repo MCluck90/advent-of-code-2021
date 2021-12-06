@@ -57,7 +57,17 @@ async function getChallenge(day: number): Promise<Challenge> {
   const title = $description.children('h2').text().replace(/---/g, '').trim()
   const testInput = $('pre').first().text().trim()
 
-  const turndownService = new TurndownService()
+  const turndownService = new TurndownService({
+    emDelimiter: '**' as '*',
+  })
+  turndownService.addRule('em', {
+    filter(node, options) {
+      return node.nodeName === 'EM' && node.parentNode?.nodeName === 'CODE'
+    },
+    replacement(content, node, options) {
+      return content
+    },
+  })
   return {
     title,
     description: turndownService.turndown(
