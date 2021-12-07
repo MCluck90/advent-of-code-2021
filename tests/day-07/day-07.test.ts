@@ -47,19 +47,33 @@ describe('Day 7: The Treachery of Whales', () => {
     })
   })
 
-  xdescribe('Part 2', () => {
+  describe('Part 2', () => {
     function solution(input: Input): number {
-      return -1
+      const min = Math.min(...input)
+      const max = Math.max(...input)
+      let minSum = Infinity
+      for (let n = min; n <= max; n++) {
+        let sum = 0
+
+        for (const n1 of input) {
+          const diff = Math.abs(n - n1)
+          sum += Math.ceil((diff * (diff + 1)) / 2)
+        }
+
+        minSum = Math.min(sum, minSum)
+      }
+
+      return minSum
     }
 
     test('with example data', () => {
       const testData = load('test-2')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(168)
     })
 
     test('with puzzle input', () => {
       const testData = load('puzzle')
-      expect(solution(testData)).toBe(0)
+      expect(solution(testData)).toBe(87640209)
     })
   })
 })
